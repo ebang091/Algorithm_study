@@ -58,9 +58,9 @@ int partitionArray(int data[], int l, int r, int k) //정렬 후 새로운 피�
 
     while (pl <= pr)
     {
-        while (data[pl] <= pivot && pl <= r)
+        while (data[pl] <= pivot && pl <= r) // 나중 조건을 잊지 않도록 조심해야 한다!!
             pl++;
-        while (data[pr] >= pivot && pr >= l)
+        while (data[pr] >= pivot && pr >= l) // 나중 조건!
             pr--;
         if (pl <= pr)
         {
