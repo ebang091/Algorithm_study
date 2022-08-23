@@ -53,12 +53,13 @@ void	insertVertex(Graph *graph, VertexNode *vertexnode)//Graph에 vertexnode를 
 void	insertEdgeToList(Edge *newedge, EdgeNode * edgenodelist)
 {
 	EdgeNode *ptr = edgenodelist;
+	EdgeNode *newedgenode = (EdgeNode *)malloc(sizeof(EdgeNode));
 	while(ptr->next != NULL)
 		ptr = ptr->next;
-	ptr->next = (EdgeNode *)malloc(sizeof(EdgeNode));
-	ptr->next->edge = newedge;
-	ptr->next->prev = ptr;
-	ptr->next->next = NULL;
+	ptr->next = newedgenode;
+	newedgenode->edge = newedge;
+	newedgenode->next = NULL;
+	newedgenode->prev = ptr;
 }
 
 EdgeNode	*newEdgeNode(Edge *edge)
@@ -91,8 +92,8 @@ EdgeNode	*newEdge(Vertex *vertex1, Vertex *vertex2)
 	edge->endPoint = vertex2;
 	insertEdgeToList(edge, vertex1->edgeList);
 	insertEdgeToList(edge, vertex2->edgeList);
-	printf("check1: edge %c to %c\n", vertex1->edgeList->next->next->edge->startPoint,vertex1->edgeList->next->next->edge->endPoint);
-	printf("check1: edge %c to %c\n", vertex2->edgeList->next->next->edge->startPoint,vertex2->edgeList->next->next->edge->endPoint );
+	//printf("check1: edge %c to %c\n", vertex1->edgeList->next->edge->startPoint->data,vertex1->edgeList->next->edge->endPoint->data);
+	//printf("check2: edge %c to %c\n", vertex2->edgeList->next->edge->startPoint->data,vertex2->edgeList->next->edge->endPoint->data );
 	EdgeNode *edgenode = newEdgeNode(edge);
 	return (edgenode);
 }
@@ -110,7 +111,7 @@ void	printGraph(Graph * graph)
 		edgenode = vertexnode->vertex->edgeList->next;
 		while(edgenode != NULL )
 		{	
-			printf(" and Edgelist: %c-%c\n", edgenode->edge->startPoint, edgenode->edge->endPoint);
+			printf(" and Edgelist: %c-%c\n", edgenode->edge->startPoint->data, edgenode->edge->endPoint->data);
 			edgenode = edgenode->next;
 		}
 		vertexnode = vertexnode->next;
@@ -166,7 +167,7 @@ void	deleteEdgeNode(EdgeNode * edgenode, int key)//key가 FALSE일때는 다 처
 }
 
 
-void	deleteVertexNode(VertexNode  *vertexnode)//vertex 관련 edgeList는 삭제했어도 edgeNode는
+void	deleteVertexNode(Graph *graph, VertexNode  *vertexnode)//vertex 관련 edgeList는 삭제했어도 edgeNode는
 {
 	VertexNode *rptr = vertexnode;
 	VertexNode *ptr;
@@ -187,6 +188,7 @@ void	deleteVertexNode(VertexNode  *vertexnode)//vertex 관련 edgeList는 삭제
 	//vertex삭제
 	free(rptr->vertex);
 	//vertexnode연결
+	graph->vertices = rptr->next;
 	if (rptr->prev != NULL)
 		rptr->prev->next = rptr->next;
 	if (rptr->next != NULL)
@@ -196,27 +198,29 @@ void	deleteVertexNode(VertexNode  *vertexnode)//vertex 관련 edgeList는 삭제
 
 void	deleteGraph(Graph *graph)
 {
-	EdgeNode * eptr = graph->vertices;
+	EdgeNode * eptr = graph->edges->next;
 	EdgeNode * reptr;
-	VertexNode *vptr = graph->edges;
+	VertexNode *vptr = graph->vertices->next;
 	VertexNode *rvptr;
 	
-	
+	//VertexNode 삭제. 	
 	while(vptr != NULL)
 	{
 		rvptr = vptr->next;
-		deleteVertexNode(vptr);   
+		deleteVertexNode(graph, vptr);   
 		vptr = rvptr;
 	}
 	printf("\nAfter vertex delete\n");
 	printGraph(graph);
 	while(eptr != NULL)
-
 	{
 		reptr = eptr->next;
 		free(eptr);
 		eptr = reptr;
 	}
+	free(graph->vertices);
+	free(graph->edges);
+	free(graph);
 
 }
 
@@ -225,5 +229,5 @@ int main()
 	Graph *graph = newGraph();
 	createGraph(graph);
 	printGraph(graph);
-	//deleteGraph(graph);
+	deleteGraph(graph);
 }
