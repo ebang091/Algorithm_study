@@ -4,6 +4,6 @@
   graph.c graph.h
   
 2. for algorithm for graph:
-  graph_algorithm.c graph_algorithm.h  + graph_BFS.c ro graph_DFS.c
+  (graph_algorithm.c graph_algorithm.h)  + graph_BFS.c or graph_DFS.c
   
   thank you!
