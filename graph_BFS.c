@@ -42,7 +42,7 @@ while(list != null)
 					if(edgenode->edge->label == FRESH)	
 						{
 							printf("BACK edge : %c-%c\n", edgenode->edge->startPoint->data, edgenode->edge->endPoint->data);
-							edgenode->edge->label = BACK;
+							edgenode->edge->label = CROSS;
 						}
 				}	
 			}
