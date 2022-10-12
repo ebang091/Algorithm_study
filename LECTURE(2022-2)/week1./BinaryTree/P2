@@ -1,0 +1,121 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <string.h>
+#pragma warning(disable : 4996)
+typedef struct node{
+	int data;
+	struct node* left;
+	struct node* right;
+}Node;
+
+typedef struct tree_ {
+	Node* root;
+}Tree;
+
+void treeInit(Tree* tree, int root)//root을 새롭게 넣어주면서 새로운 tree를 만든다. 
+{
+	tree->root = (Node*)malloc(sizeof(Node));
+	tree->root->data = root;
+	tree->root->left = NULL;
+	tree->root->right = NULL;
+}
+
+Node* makeNewNode(int data)//왼쪽. 오른쪽 자식은 NULL로 되어있는, 데이터만 갖고 있는 노드 반환.
+{
+	if (data == 0)//어떤 데이터를 넣는 것이 아니라 그대로 말단 노드가 되도록 NULL을 반환한다. 
+		return(NULL);
+	Node* node = (Node*)malloc(sizeof(Node));
+	node->data = data;
+	node->left = NULL;
+	node->right = NULL;
+	return (node);
+}
+
+void	makeSubTree(Node* root, int left, int right) //root의 왼쪽, 오른쪽 노드를 새롭게 생성한다. (data를 가지고)
+{
+	root->left = makeNewNode(left);
+	root->right = makeNewNode(right);
+}
+
+Node* findNode(Node* root, int data)
+{
+	//root에서 data가 있는지 검사 후, 맞다면 root를 반환, 
+	//없다면 왼쪽에서 찾고 오른쪽에서 찾되, 왼쪽에서 못찾으면 오른쪽으로 찾을 자리를 마련해놔야 한다.
+	//왼쪽에서 찾을 때는 왼쪽에서 찾고 반환받는다.
+	//오른쪽에서 찾을 때도 오른쪽에서 찾고 반환받는다. 
+	//왼쪽이 먼저 NULL이되면 그 부모에서 오른쪽으로 갈라져서 찾기 시작한다. 
+	//재귀, DFS, BFS를 공부해야한다. 
+	if (root == NULL)return NULL;
+	if (root->data == data)return root;
+	Node* left = findNode(root->left, data);
+	if (left != NULL)return left;
+	Node* right = findNode(root->right, data);
+	if (right != NULL)return right;
+}
+
+void treeSearch(Tree* tree, char* str)
+{
+	//str에 있는 RLL에 따라서 차례로 트리 내부의 데이터를 출력한다.
+	Node* ptr = tree->root;
+	Node* next = 0;
+	int	 i = 0;
+	while (str[i] != '\0')
+	{
+		printf("%d ", ptr->data);
+		if (str[i] == 'R')
+			next = ptr->right;
+		else if (str[i] == 'L')
+			next = ptr->left;
+
+		if (next != NULL)
+		{
+			ptr = next;
+		}
+		else
+			return;
+		i++;
+	}
+
+	printf("%d\n",ptr->data);//NULL문자에 도달하면서 출력안되기 때문에 따로
+	
+}
+
+int main()
+{
+	Tree* tree = (Tree*)malloc(sizeof(Tree));
+
+
+	int		 n;
+	int		 root, right, left;
+	int		 timesforSearch;
+	char	order[101];
+	scanf("%d", &n);
+	for (int i = 0; i < n; i++)
+	{
+		scanf("%d %d %d", &root, &left, &right);
+		if (i == 0)
+			treeInit(tree, root);
+		Node* p = findNode(tree->root, root);
+		//printf("%d", p->data);
+		makeSubTree(p, left, right);
+	}
+	scanf("%d", &timesforSearch);
+	for (int i = 0; i < timesforSearch; i++)
+	{
+		scanf("%s", order);
+		printf("%s\n", order);
+		treeSearch(tree, order);
+	}
+
+}
+
+
+/*
+P:
+◦ 트리 정보
+- 첫 째 줄에 노드의 개수 n이 주어진다. - 다음 n개의 줄에, 선위순회 순서로 노드의 정보가 주어진다(위 설명 참조).
+◦ 탐색 정보 (트리 정보가 모두 주어진 후) - 탐색 횟수 s가 주어진다. - 다음 s개의 줄에 탐색 정보가 주어진다(각 탐색은 루트에서 새로 시작). - 하나의 탐색 정보는 공백없이, L과 R로 구성된 문자열(최대 길이 100)로 주어진다. - 유효하지 않은 탐색 정보는 주어지지 않는다. 예를 들어, 위 트리에서 RRR 과 같은 탐색
+정보는 유효하지 않다. 두 번 오른쪽 자식을 따라 내려가면 노드 10인데, 노드 10의
+오른쪽 자식은 정의되지 않았다. 
+*/
