@@ -1,0 +1,193 @@
+#pragma warning(disable:4996)
+#include <stdio.h>
+#include <stdlib.h>
+
+
+typedef struct _node {
+	struct _node* prev;
+	char data;
+	struct _node* next;
+}node;
+
+typedef struct _list
+{
+	int numOfData;
+	node* head;
+}list;
+
+void	ft_put_error(int code)
+{
+	//if (code == 1)
+		//printf("rank error\n");
+	//else if (code == 2)
+		//printf("ptr find error\n");
+
+	exit(1);
+}
+
+list* initList()
+{
+	list* lst = (list*)malloc(sizeof(list));
+	lst->numOfData = 0;
+	lst->head = (node*)malloc(sizeof(node));
+	lst->head->next = NULL;
+	lst->head->prev = NULL;
+	return (lst);
+}
+
+
+void	add(list* lst, int rank, char data)
+{
+	//rank위치에 data 보관
+	//처음: head만 (더미 노드)
+	//추가: 1순위에 data추가.
+	//		2순위 이상이라면 오류.
+	//	총 data수를 저장하고 오류 처리하자.
+	int findrank = 0;
+	if (rank > lst->numOfData + 1)
+	{
+		printf("invalid position\n");
+		return (0);
+	}
+	node* ptr = lst->head;
+	while (findrank < rank - 1)
+	{
+
+		findrank++;
+		ptr = ptr->next;
+	}
+	if (!ptr)
+		ft_put_error(2);
+	node* newnode = (node*)malloc(sizeof(node));
+	newnode->data = data;
+	if (ptr->next != NULL)//맨 마지막 노드에 추가하는 경우가 아닐 때
+	{
+		newnode->next = ptr->next;
+		ptr->next->prev = newnode;
+	}
+	else
+		newnode->next = NULL;
+	newnode->prev = ptr;
+	ptr->next = newnode;
+	lst->numOfData++;
+}
+
+
+void	delete(list* lst, int rank)
+{
+	//numofData보다 rank가 크면 오류
+	//rank 노드를 찾는다.
+	//앞 뒤 노드를 이어준다. (NULL이어도 상관없음.  head여도 상관없음.)
+	//삭제 노드를 해제.
+	if (rank < 0 || rank > lst->numOfData)
+	{
+		printf("invalid position\n");
+		return (0);
+	}
+	int	findrank = 0;
+	node* ptr = lst->head;
+	while (findrank < rank)
+	{
+		findrank++;
+		ptr = ptr->next;
+	}
+	if (!ptr)
+		return 0;
+	if (ptr->prev)
+		ptr->prev->next = ptr->next;
+	if (ptr->next)
+		ptr->next->prev = ptr->prev;
+	free(ptr);
+	lst->numOfData--;
+}
+
+void	print(list* lst)
+{
+	node* ptr = lst->head->next;
+	while (ptr != NULL)
+	{
+		printf("%c", ptr->data);
+		ptr = ptr->next;
+	}
+	printf("\n");
+}
+
+char 	get(list* lst, int r)
+{
+	if (r < 0 || r > lst->numOfData)
+	{
+		printf("invalid position\n");
+		return (0);
+	}
+	int	findrank = 0;
+	node* ptr = lst->head;
+	while (findrank < r)
+	{
+		findrank++;
+		ptr = ptr->next;
+	}
+	if (!ptr)
+		return 0;
+	return(ptr->data);
+}
+
+int main()
+{
+	list* list = initList();
+	int numOfMenu;
+	char typeOfMenu;
+	int rank;
+	char data;
+	int cnt = 0;
+
+	scanf("%d", &numOfMenu);
+	while (cnt < numOfMenu)
+	{
+		getchar();
+		scanf("%c", &typeOfMenu);
+
+
+		switch (typeOfMenu)
+		{
+		case 'A':
+			scanf("%d %c", &rank, &data);
+			//printf("add %d %c\n", rank, data);
+			add(list, rank, data);
+			break;
+
+		case 'D':
+			scanf("%d", &rank);
+			//printf("delete %d\n", rank);
+			delete(list, rank);
+			break;
+		case 'P':
+			//	printf("print the list\n");
+			print(list);
+			break;
+		case 'G':
+			scanf("%d", &rank);
+			//printf("get rank %d\n", rank);
+			data = get(list, rank);
+			if (data != 0)
+				printf("%c\n", data);
+			break;
+
+		}
+		cnt++;
+
+	}
+	printf("\n");
+}
+
+
+/*
+리스트 구현하기
+5 ↦ 연산의 개수: 5
+A 1 S ↦ add(list, 1, 'S')
+A 2 t ↦ add(list, 2, 't')
+A 3 r ↦ add(list, 3, 'r')
+A 3 a ↦ add(list, 3, 'a')
+P ↦ print(list)
+
+출력 : Star
+*/
